@@ -1,9 +1,22 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Navbar from './Navbar';
 
-function View() {
+function View_product() {
+
+  let navigate =useNavigate()
+
+  const checkToken =()=>{
+    let token = localStorage.getItem('myapptoken')
+    if(!token){
+      navigate('/')
+    }
+  }
+
+  useEffect(()=>{
+    checkToken()
+  },[])
+
   let params = useParams();
   const [product, setProduct] = useState({});
   console.log(params.id);
@@ -22,7 +35,7 @@ function View() {
 
   return (
 <>
-<Navbar/>
+
 <div className="container">
       <div class="card" style={{ width: '18rem' }}>
         <img src={product.image} class="card-img-top" alt="..." />
@@ -43,4 +56,4 @@ function View() {
 }
 
 
-export default View
+export default View_product

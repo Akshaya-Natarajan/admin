@@ -1,36 +1,53 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import Navbar from './Navbar'
-import { Link } from 'react-router-dom';
+import { Link ,useNavigate} from 'react-router-dom';
+import bg from '../images/bg.jpg'
 
-function Shopkeeper() {
-    const [UserList, setUserList] = useState([]);
+function Order() {
+    const [OrderList, setOrderList] = useState([]);
 
-    const [user, setUser] = useState({
-        sname: '',
+    const [order, setOrder] = useState({
+        order_number: '',
         fname: '',
         lname: '',
         phone: '',
         email: '',
+        order:''
     });
-    const fetchUserList = async () => {
-        const res = await axios.get(
-          'http://localhost:7000/get/all/Users'
-        );
+    const fetchOrderList = async () => {
+        const res = await axios.get('http://localhost:8000/create/new/customer',order);
         console.log(res)
         if(res.data.status===1){
-          setUserList(res.data.response)
+          setOrderList(res.data.response)
         } 
       };
         useEffect(() => {
-        fetchUserList();
+        fetchOrderList();
       }, []);
 
-    return (
-        <>
-            <Navbar />
-            <div className='container m-auto p-5'>
-                <div className='container-fluid m-auto'>
+
+      let navigate =useNavigate()
+
+      const checkToken =()=>{
+        let token = localStorage.getItem('myapptoken')
+        if(!token){
+          navigate('/')
+        }
+      }
+    
+      useEffect(()=>{
+        checkToken()
+      },[])
+
+
+
+      return (
+            <>
+            <div className='has-bg-img z-0 position-relative'>
+            <img className='bg-img bg-image-ripple' data-mdb-ripple-color="light" src={bg}/>
+
+            <div className='container top-0 mt-5  z-1 position-absolute'>
+              
                     {/* card1 */}
                     <div class="row m-auto text-center justify-content-center">
                         <div class="col-sm-3">
@@ -53,29 +70,30 @@ function Shopkeeper() {
                     </div>
                 {/* table */}
                 <div className='m-4 d-flex justify-content-end'>
-                <Link to={'/create/new/user'}><button className='btn btn-dark text-light'>+Add new Shopkeeper</button></Link>
+                <Link to={'/create/new/order'}><button className='btn btn-dark text-light'>+Add new Order</button></Link>
                 </div>
                 <table class="table table-bordered table-hover">
           <thead>
             <tr>
               
-              <th>SHOP NAME</th>
+              <th>ORDER NUMBER</th>
               <th>FIRST NAME</th>
               <th>LAST NAME</th>
               <th>PHONE NUMBER</th>
               <th>EMAIL</th>
-              <th>Action</th>
+              <th>ORDER DETAILS</th>
             </tr>
           </thead>
           <tbody>
-            {UserList.map((user) => {
+            {OrderList.map((order) => {
               return (
                 <tr>
-                  <td>{user.shop_name}</td>
-                  <td>{user.first_name}</td>
-                  <td>{user.last_name}</td>
-                  <td>{user.phone_number}</td>
-                  <td>{user.email}</td>               
+                  <td>{order.order_number}</td>
+                  <td>{order.first_name}</td>
+                  <td>{order.last_name}</td>
+                  <td>{order.phone_number}</td>
+                  <td>{order.email}</td>
+                  <td>{order.order}</td>               
 
                   <td>                  
                     <i
@@ -99,10 +117,11 @@ function Shopkeeper() {
             })}
           </tbody>
         </table>
-      </div>
      </div>
+            </div>
+           
    </>
   )
 }
 
-export default Shopkeeper
+export default Order

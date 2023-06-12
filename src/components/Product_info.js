@@ -1,13 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import swal from 'sweetalert';
-import Navbar from './Navbar';
+import bg from '../images/bg.jpg'
 
 function Product_info() {
-
+  let token = localStorage.getItem('myapptoken')
   const [productList, setProductList] = useState([]);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState('');
@@ -15,11 +15,14 @@ function Product_info() {
 
   const fetchProductList = async () => {
     const res = await axios.get(
-      'http://localhost:7000/get/all/crackers'
+      'http://localhost:7000/get/all/crackers',{headers:{Authorization:token}}
     );
     
     if(res.data.status===1){
       setProductList(res.data.response)
+    }
+    if(res.data.status===0){
+      toast.error(res.data.message)
     }
     
    
@@ -28,6 +31,19 @@ function Product_info() {
   useEffect(() => {
     fetchProductList();
   }, []);
+
+  let navigate =useNavigate()
+
+  const checkToken =()=>{
+    let token = localStorage.getItem('myapptoken')
+    if(!token){
+      navigate('/')
+    }
+  }
+
+  useEffect(()=>{
+    checkToken()
+  },[])
 
   const modelOpen = (id) => {
     setModal(!modal);
@@ -91,11 +107,11 @@ function Product_info() {
     }
   };
   return (
-    <div>
-      <Navbar/>
-      <div class="container mt-3 p-5">
-      <div className='conatiner-fluid m-auto'>
-        <h2>PRODUCT INFO</h2>
+    <div className='has-bg-img z-0 position-relative'>
+      <img className='bg-img bg-image-ripple' data-mdb-ripple-color="light" src={bg}/>
+     
+      <div class="container z-1 position-absolute  top-0 mt-5">
+        <h5>PRODUCT INFO</h5>
         <p>Current product list</p>
         <table class="table table-bordered table-hover">
           <thead>
@@ -110,7 +126,7 @@ function Product_info() {
             </tr>
           </thead>
           <tbody>
-            {productList.map((product, i) => {
+            {productList.map((product) => {
               return (
                 <tr>
                   <td>{product.code}</td>
@@ -146,13 +162,13 @@ function Product_info() {
             })}
           </tbody>
         </table>
-        </div>
+      
       </div>
       <Toaster />
       <Modal isOpen={modal} toggle={closeToggle} centered size="lg">
         <ModalHeader>Edit Product Detail</ModalHeader>
         <ModalBody>
-          <div className="container">
+          <div className="container ">
             <div className="row  mt-4">
               <div className="col-6">
                 <div class="mb-3">
@@ -240,6 +256,7 @@ function Product_info() {
               </div>
             </div>
             <button
+
               className=" btn btn-sm btn-primary"
               onClick={handleEditUpdate}>Update
             </button>
